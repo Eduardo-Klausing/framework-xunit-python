@@ -1,6 +1,7 @@
 # xunit.py
 
 class TestResult:
+    # ... (código existente, sem alterações)
     def __init__(self):
         self.run_count = 0
         self.failures = []
@@ -19,6 +20,7 @@ class TestResult:
         return f"{self.run_count} run, {len(self.failures)} failed, {len(self.errors)} error"
 
 class TestCase:
+    # ... (código existente, sem alterações)
     def __init__(self, test_method_name):
         self.test_method_name = test_method_name
 
@@ -40,3 +42,18 @@ class TestCase:
             result.add_error(self.test_method_name)
         
         self.tear_down()
+
+class TestSuite:
+    """
+    Uma suíte de testes que agrupa múltiplos TestCases (ou outras TestSuites).
+    Utiliza o padrão Composite, tendo o mesmo método run() que TestCase.
+    """
+    def __init__(self):
+        self.tests = []
+
+    def add_test(self, test):
+        self.tests.append(test)
+
+    def run(self, result):
+        for test in self.tests:
+            test.run(result)
