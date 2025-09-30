@@ -1,42 +1,42 @@
 # xunit.py
 
-class TestCase:
-    """
-    A classe TestCase serve como a base para a criação de novos casos de teste.
-    Cada método de teste em uma subclasse deve ser executado de forma independente.
-    """
+class TestResult:
+    def __init__(self):
+        self.run_count = 0
+        self.failures = []
+        self.errors = []
 
+    def test_started(self):
+        self.run_count += 1
+
+    def add_failure(self, test_method_name):
+        self.failures.append(test_method_name)
+
+    def add_error(self, test_method_name):
+        self.errors.append(test_method_name)
+
+    def summary(self):
+        return f"{self.run_count} run, {len(self.failures)} failed, {len(self.errors)} error"
+
+class TestCase:
     def __init__(self, test_method_name):
-        """
-        Construtor que armazena o nome do método de teste a ser executado.
-        
-        :param test_method_name: O nome (string) do método de teste.
-        """
         self.test_method_name = test_method_name
 
     def set_up(self):
-        """
-        Método de setup (fixture). É executado antes de cada método de teste.
-        Subclasses podem sobrescrevê-lo para preparar o ambiente de teste.
-        """
         pass
 
     def tear_down(self):
-        """
-        Método de teardown (fixture). É executado após cada método de teste.
-        Subclasses podem sobrescrevê-lo para limpar o ambiente de teste.
-        """
         pass
 
-    def run(self):
-        """
-        Este é o Template Method que orquestra a execução de um teste.
-        Ele garante que set_up e tear_down sejam chamados na ordem correta.
-        """
+    def run(self, result):
+        result.test_started()
         self.set_up()
-        
-        # getattr é usado para obter o método a partir do seu nome (string) e executá-lo.
-        method = getattr(self, self.test_method_name)
-        method()
+        try:
+            method = getattr(self, self.test_method_name)
+            method()
+        except AssertionError:
+            result.add_failure(self.test_method_name)
+        except Exception:
+            result.add_error(self.test_method_name)
         
         self.tear_down()
